@@ -1,0 +1,31 @@
+#Makefile pour compilation du projet : PST
+.PHONY: clean
+
+#Compilateur
+CC = gcc
+
+#Nom de l'Executable
+EXEC = Server
+
+#Extension des sources
+EXT = c
+
+#Construction des sources et objets
+CHEMIN_SRC = srcServer
+SRC = $(wildcard $(CHEMIN_SRC)/*.$(EXT)) #Tous les fichiers c du projet
+OBJ = $(SRC:$(CHEMIN_SRC)/%.$(EXT)=$(CHEMIN_SRC)/%.o) #Tout les fichiers objet
+
+#Executable
+all: $(EXEC)
+
+#Construction de l'éxecutable
+$(EXEC): $(OBJ)
+						$(CC) -o $@ $^ $(CFLAGS)
+
+#Construction des fichiers objets
+$(CHEMIN_SRC)/%.o: $(CHEMIN_SRC)/%.$(EXT)
+											$(CC) -c $^ -o $@ $(CFLAGS)
+
+#Pour effacer les fichiers objets : appeler make clean
+clean : 
+				rm $(CHEMIN_SRC)/*.o
