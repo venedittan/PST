@@ -9,3 +9,4 @@ int ReceptionMessageServer(UDPConnexion,char*);
 int EnvoiMessageServer(UDPConnexion,char*);
 int AttenteMessage(UDPConnexion);
 void FermetureConnexion(UDPConnexion,int);
+const char* ErreurBind(int);

@@ -1,5 +1,37 @@
 #include "../include/libCamera.h"
 
+/*Fonction de gestion pour l'erreur*/
+const char* ErreurBind(int erreur){
+	switch(erreur){
+		case EACCES : 
+			return "L'adresse est protégée et l'utilisateur n'est pas le superutilisateur";
+
+		case EADDRINUSE : 
+			return "L'adresse fournie est déja utilisée";
+
+		case EBADF : 
+			return "sockfd n'est pas un descripteur valide";
+
+		case ENOTSOCK : 
+			return "sockd est un descripteur de fichier , pas d'un socket";
+
+		case EADDRNOTAVAIL : 
+			return "Une interface inexistance a été demandée ou bien l'adresse demandée n'est pas locale";
+
+		case EFAULT : 
+			return "addr pointe en dehors de l'espace d'adresse accessible";
+
+		case EINVAL : 
+			return "La longueur addrlen est fausse , ou la socket n'est pas de la famille AF_UNIX";
+
+		case ELOOP : 
+			return "addr contient des références circulaires";
+
+		default:
+			return "Erreur Autre";
+	}
+}
+
 /*Fonction de connexion*/
 UDPConnexion ConnexionServer(char* ipv4,int port,unsigned short int tailleMessage){
 
@@ -47,7 +79,7 @@ UDPConnexion ConnexionServer(char* ipv4,int port,unsigned short int tailleMessag
 	/*On lie la connexion*/
 	if(bind(interface.lienConnexion,interface.infoServeur->ai_addr,interface.infoServeur->ai_addrlen) == -1){
 		close(interface.lienConnexion);
-		fprintf(stderr,"Erreur lors de la liaison au port %s \n",interface.port);
+		fprintf(stderr,"Erreur lors de la liaison au port %s -> Erreur : %s \n",interface.port,ErreurBind(errno));
 		exit(EXIT_FAILURE);
 	}
 
@@ -99,7 +131,7 @@ UDPConnexion ConnexionClient(int port,unsigned short int tailleMessage){
 	/*On lie la connexion*/
 	if(bind(interface.lienConnexion,interface.infoServeur->ai_addr,interface.infoServeur->ai_addrlen) == -1){
 		close(interface.lienConnexion);
-		fprintf(stderr,"Erreur lors de la liaison au port %s \n",interface.port);
+		fprintf(stderr,"Erreur lors de la liaison au port %s -> Erreur : %s \n",interface.port,ErreurBind(errno));
 		exit(EXIT_FAILURE);
 	}
 
@@ -149,4 +181,6 @@ void FermetureConnexion(UDPConnexion interface,int Erreur){
 	close(interface.lienConnexion);
 	exit((Erreur == EXIT_FAILURE) ? EXIT_FAILURE : EXIT_SUCCESS);
 }
+
+
 
