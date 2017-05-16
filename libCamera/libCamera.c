@@ -78,8 +78,7 @@ UDPConnexion ConnexionServer(char* ipv4,int port,unsigned short int tailleMessag
 	}
 
 	/*On lie la connexion*/
-	if(bind(interface.lienConnexion,interface.infoServeur->ai_addr,interface.infoServeur->ai_addrlen) == -1){
-		close(interface.lienConnexion);
+	if(connect(interface.lienConnexion,interface.infoServeur->ai_addr,interface.infoServeur->ai_addrlen) == -1){
 		fprintf(stderr,"Erreur lors de la liaison au port %s -> Erreur : %s \n",interface.port,ErreurBind(errno));
 		exit(EXIT_FAILURE);
 	}

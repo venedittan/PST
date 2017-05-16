@@ -3,46 +3,46 @@
 int main()
 {
 	UDPConnexion interface;
-	int i;
-	struct sockaddr_in adresseClient;
+	int port;
+	char msg[MAX_MSG + 1],ipv4[IPv4_LENGTH];
 
-	char msg[MAX_MSG + 1];
-	
-	/*Initialisation de la connexion UDP*/
-	interface = ConnexionClient(8080,MAX_MSG + 1);
+	/*Paramètres*/
+	printf("Entrez le nom du serveur ou son adresse IP : ");
+	fgets(ipv4,IPv4_LENGTH,stdin);
 
-	// Libération de la mémoire occupée par les enregistrements
-	printf("Attente de requête sur le port %s\n",interface.port);
+	//Initialisation de la connexion UDP
+	interface = ConnexionServer(ipv4,8080,MAX_MSG+1);
 
-	while (1) {
-		// Mise à zéro du tampon de façon à connaître le délimiteur
-		// de fin de chaîne.
-		memset(msg, 0, sizeof msg);
+	printf("Test -> Entrez un message de moins de %d caractères : ",MAX_MSG);
+	fgets(msg,MAX_MSG+1,stdin);
 
-		if (!ReceptionMessageClient(interface,&adresseClient,msg)) {
-			perror("Erreur lors de la réception du message");
-			FermetureConnexion(interface,EXIT_FAILURE);
-		}
-		
+
+	// Arrêt lorsque l'utilisateur saisit une ligne ne contenant qu'un point
+	while (strcmp(msg, ".")) {
 		if (strlen(msg) > 0) {
-			// Affichage de l'adresse IP du client.
-			printf(">> depuis %s", inet_ntoa(adresseClient.sin_addr));
-
-			// Affichage du numéro de port du client.
-			printf(":%hu\n", ntohs(adresseClient.sin_port));
-			
-			// Affichage de la ligne reçue
-			printf(" Message reçu : %s\n", msg);
-			
-			// Conversion de cette ligne en majuscules.
-			for (i = 0; i < strlen(msg); i++)
-				msg[i] = toupper(msg[i]);
-
-			// Renvoi de la ligne convertie au client.
-			if (!EnvoiMessageClient(interface,&adresseClient,msg)) {
-				perror("Erreur lors de l'envoi du message");
+			// Envoi de la ligne au serveur
+			if (!EnvoiMessageServer(interface,msg)) {
+				perror("Erreur lors de l'envoi du message \n");
 				FermetureConnexion(interface,EXIT_FAILURE);
 			}
+
+			//Traitement du message
+			if (AttenteMessage(interface)) {
+				// Lecture de la ligne modifiée par le serveur.
+				memset(msg, 0, sizeof msg); // Mise à zéro du tampon
+				if (!ReceptionMessageServer(interface,msg)) {
+					perror("Erreur lors de la réception du message \n");
+					FermetureConnexion(interface,EXIT_FAILURE);
+				}
+				printf("Message traité : %s\n", msg);
+			}
+			else 
+				printf("Pas de réponse dans la seconde. \n");			
 		}
+		//Nouveau message
+		printf("Entrez un message de moins de %d caractères : ",MAX_MSG);
+		fgets(msg,MAX_MSG+1,stdin);
 	}
+	//Fin connexion
+	FermetureConnexion(interface,EXIT_SUCCESS);
 }
