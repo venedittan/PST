@@ -144,22 +144,22 @@ UDPConnexion ConnexionClient(int port,unsigned short int tailleMessage){
 
 /*Reception Message Client*/
 int ReceptionMessageClient(UDPConnexion interface,struct sockaddr_in* adresseClient,char *msg){
-	return recvfrom(interface.lienConnexion,msg,strlen(msg),0,(struct sockaddr *) adresseClient,&(interface.longueurAdresseClient)) != -1;
+	return recvfrom(interface.lienConnexion,msg,sizeof(msg),0,(struct sockaddr *) adresseClient,&(interface.longueurAdresseClient)) != -1;
 }
 
 /*Envoi Message Client*/
 int EnvoiMessageClient(UDPConnexion interface,struct sockaddr_in* adresseClient,char *msg){
-	return sendto(interface.lienConnexion,msg,strlen(msg),0,(struct sockaddr *) adresseClient,interface.longueurAdresseClient) != -1;
+	return sendto(interface.lienConnexion,msg,sizeof(msg),0,(struct sockaddr *) adresseClient,interface.longueurAdresseClient) != -1;
 }
 
 /*Reception Message Serveur*/
 int ReceptionMessageServer(UDPConnexion interface,char *msg){
-	return recv(interface.lienConnexion,msg,strlen(msg),0) != -1;
+	return recv(interface.lienConnexion,msg,sizeof(msg),0) != -1;
 }
 
 /*Envoi Message Serveur*/
 int EnvoiMessageServer(UDPConnexion interface,char *msg){
-	return sendto(interface.lienConnexion,msg,strlen(msg),0,interface.infoServeur->ai_addr,interface.infoServeur->ai_addrlen) != -1;
+	return sendto(interface.lienConnexion,msg,sizeof(msg),0,interface.infoServeur->ai_addr,interface.infoServeur->ai_addrlen) != -1;
 }
 
 /*Attente Message 1s*/
