@@ -9,8 +9,10 @@ UDPConnexion ConnexionServer(char* ipv4,int port,unsigned short int tailleMessag
 
 	/*Initialisation de la nouvelle connexion*/
 	strcpy(interface.ipv4,ipv4);
+	memset(&(interface.hints), 0, sizeof(interface.hints));
 	interface.hints.ai_family = AF_INET; // IPv4
 	interface.hints.ai_socktype = SOCK_DGRAM; // UDP
+
 	interface.longueurAdresseClient = sizeof(struct sockaddr_in);
 	interface.lienConnexion = 0;
 	interface.infoServeur = NULL;
@@ -19,8 +21,10 @@ UDPConnexion ConnexionServer(char* ipv4,int port,unsigned short int tailleMessag
 	/*Vérification du port d'écoute*/
 	if(port >= 1500 && port <= 65000){
 		sprintf(portStr,"%d",port);
+		memset(interface.port,0,sizeof(interface.port));
 		strcpy(interface.port,portStr);
 	}
+
 	else{
 		perror("Le port d'écoute n'est pas compris entre 1500 et 65000");
 		exit(EXIT_FAILURE);
@@ -28,8 +32,8 @@ UDPConnexion ConnexionServer(char* ipv4,int port,unsigned short int tailleMessag
 
 	/*Vérification du statut*/
 	interface.statut = getaddrinfo(interface.ipv4,interface.port,&(interface.hints),&(interface.infoServeur));
-	if(!interface.statut){
-		fprintf(stderr,"Erreur de connexion sur le port %s -> statut : %d \n",interface.port,interface.statut);
+	if(interface.statut){
+		fprintf(stderr,"Erreur de connexion sur le port %s -> statut : %s \n",interface.port,gai_strerror(interface.statut));
 		exit(EXIT_FAILURE);
 	}
 
@@ -59,6 +63,7 @@ UDPConnexion ConnexionClient(int port,unsigned short int tailleMessage){
 	char portStr[MAX_PORT + 1];
 
 	/*Initialisation de la nouvelle connexion*/
+	memset(&(interface.hints), 0, sizeof(interface.hints));
 	interface.hints.ai_family = AF_INET; // IPv4
 	interface.hints.ai_socktype = SOCK_DGRAM; // UDP
 	interface.hints.ai_flags = AI_PASSIVE; // Toutes les adresses disponibles
@@ -79,8 +84,8 @@ UDPConnexion ConnexionClient(int port,unsigned short int tailleMessage){
 
 	/*Vérification du statut*/
 	interface.statut = getaddrinfo(NULL,interface.port,&(interface.hints),&(interface.infoServeur));
-	if(!interface.statut){
-		fprintf(stderr,"Erreur de connexion sur le port %s -> statut : %d \n",interface.port,interface.statut);
+	if(interface.statut){
+		fprintf(stderr,"Erreur de connexion sur le port %s -> statut : %s \n",interface.port,gai_strerror(interface.statut));
 		exit(EXIT_FAILURE);
 	}
 
@@ -107,22 +112,22 @@ UDPConnexion ConnexionClient(int port,unsigned short int tailleMessage){
 
 /*Reception Message Client*/
 int ReceptionMessageClient(UDPConnexion interface,struct sockaddr_in* adresseClient,char *msg){
-	return recvfrom(interface.lienConnexion,msg,sizeof(msg),0,(struct sockaddr *) adresseClient,&(interface.longueurAdresseClient)) == -1;
+	return recvfrom(interface.lienConnexion,msg,sizeof(msg),0,(struct sockaddr *) adresseClient,&(interface.longueurAdresseClient)) != -1;
 }
 
 /*Envoi Message Client*/
 int EnvoiMessageClient(UDPConnexion interface,struct sockaddr_in* adresseClient,char *msg){
-	return sendto(interface.lienConnexion,msg,sizeof(msg),0,(struct sockaddr *) adresseClient,interface.longueurAdresseClient) == -1;
+	return sendto(interface.lienConnexion,msg,sizeof(msg),0,(struct sockaddr *) adresseClient,interface.longueurAdresseClient) != -1;
 }
 
 /*Reception Message Serveur*/
 int ReceptionMessageServer(UDPConnexion interface,char *msg){
-	return recv(interface.lienConnexion,msg,sizeof(msg),0) == -1;
+	return recv(interface.lienConnexion,msg,sizeof(msg),0) != -1;
 }
 
 /*Envoi Message Serveur*/
 int EnvoiMessageServer(UDPConnexion interface,char *msg){
-	return sendto(interface.lienConnexion,msg,sizeof(msg),0,interface.infoServeur->ai_addr,interface.infoServeur->ai_addrlen) == -1;
+	return sendto(interface.lienConnexion,msg,sizeof(msg),0,interface.infoServeur->ai_addr,interface.infoServeur->ai_addrlen) != -1;
 }
 
 /*Attente Message 1s*/
