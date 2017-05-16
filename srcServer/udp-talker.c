@@ -10,11 +10,12 @@ int main()
 	printf("Entrez le nom du serveur ou son adresse IP : ");
 	fgets(ipv4,IPv4_LENGTH,stdin);
 
+	//Initialisation de la connexion UDP
+	interface = ConnexionServer(ipv4,8080,MAX_MSG+1);
+
 	printf("Test -> Entrez un message de moins de %d caractères : ",MAX_MSG);
 	fgets(msg,MAX_MSG+1,stdin);
 
-	//Initialisation de la connexion UDP
-	interface = ConnexionServer(ipv4,8080,MAX_MSG+1);
 
 	// Arrêt lorsque l'utilisateur saisit une ligne ne contenant qu'un point
 	while (strcmp(msg, ".")) {

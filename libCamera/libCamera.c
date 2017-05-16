@@ -42,13 +42,14 @@ UDPConnexion ConnexionServer(char* ipv4,int port,unsigned short int tailleMessag
 	/*Initialisation de la nouvelle connexion*/
 	strcpy(interface.ipv4,ipv4);
 	memset(&(interface.hints), 0, sizeof(interface.hints));
+	interface.tailleMessage = tailleMessage;
 	interface.hints.ai_family = AF_INET; // IPv4
 	interface.hints.ai_socktype = SOCK_DGRAM; // UDP
 
 	interface.longueurAdresseClient = sizeof(struct sockaddr_in);
 	interface.lienConnexion = 0;
-	interface.infoServeur = NULL;
-	interface.tailleMessage = tailleMessage;
+	
+	interface.infoServeur = calloc(1,sizeof(struct addrinfo));
 
 	/*Vérification du port d'écoute*/
 	if(port >= 1500 && port <= 65000){
@@ -82,7 +83,7 @@ UDPConnexion ConnexionServer(char* ipv4,int port,unsigned short int tailleMessag
 		fprintf(stderr,"Erreur lors de la liaison au port %s -> Erreur : %s \n",interface.port,ErreurBind(errno));
 		exit(EXIT_FAILURE);
 	}
-
+	
 	/*Renvoi de la connexion*/
 	return interface; 
 }
