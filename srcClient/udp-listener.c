@@ -19,6 +19,7 @@ int main(int argc,char *argv[]){
 	if(msg == NULL){
 		perror("Erreur allocation mémoire pour les messages \n");
 		exit(EXIT_FAILURE);
+
 	}
 	
 	tailleMessage = config.tailleMessage;
@@ -27,14 +28,14 @@ int main(int argc,char *argv[]){
 	
 	/*Debut des messages*/
 	printf("Test -> Entrez un message de moins de %d caractères : ",tailleMessage);
-	GetDynamicStringFromConsole(tailleMessage); 
+	fgets(msg,tailleMessage+1,stdin); 
 	
-	// Arrêt lorsque l'utilisateur saisit une ligne ne contenant qu'un point strcmp(msg,".")
-	while (1) {
+	while (strcmp(msg,".")) {
 		if (strlen(msg) > 0) {
 			// Envoi de la ligne au serveur
 			if (!EnvoiMessageServer(interface,msg)) {
 				perror("Erreur lors de l'envoi du message \n");
+				free(msg);
 				FermetureConnexion(interface,EXIT_FAILURE);
 			}
 
@@ -44,6 +45,7 @@ int main(int argc,char *argv[]){
 				memset(msg, 0, sizeof(msg)); // Mise à zéro du tampon
 				if (!ReceptionMessageServer(interface,msg)) {
 					perror("Erreur lors de la réception du message \n");
+					free(msg);
 					FermetureConnexion(interface,EXIT_FAILURE);
 				}
 				printf("Message traité : %s\n", msg);
@@ -57,5 +59,6 @@ int main(int argc,char *argv[]){
 		fgets(msg,tailleMessage+1,stdin);
 	}
 	//Fin connexion
+	free(msg);
 	FermetureConnexion(interface,EXIT_SUCCESS);
 }
