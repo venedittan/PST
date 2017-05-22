@@ -188,7 +188,7 @@ void FermetureConnexion(UDPConnexion interface,int Erreur){
 	if(interface.ipv4 != NULL)
 		free(interface.ipv4);
 		
-	exit((Erreur > 256) ? 1 : Erreur);
+	exit(Erreur);
 }
 
 /*Fonction pour récupérer une chaine alloué dynamiquement*/
