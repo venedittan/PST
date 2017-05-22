@@ -30,7 +30,7 @@ int main(int argc,char *argv[]){
 	GetDynamicStringFromConsole(tailleMessage); 
 	
 	// Arrêt lorsque l'utilisateur saisit une ligne ne contenant qu'un point strcmp(msg,".")
-	while (1) {
+	while (0) {
 		if (strlen(msg) > 0) {
 			// Envoi de la ligne au serveur
 			if (!EnvoiMessageServer(interface,msg)) {
