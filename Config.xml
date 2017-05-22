@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ConfigCamera tailleMessage="100">
-	<Port taillePort="4">8080</Port>
-	<AdresseIP tailleAdresse="15">192.168.0.42</AdresseIP>
-	<Debit unit="Ko" temps="s">500</Debit>
+	<Port taillePort="4">7080</Port>
+	<AdresseIP tailleAdresse="15">127.0.0.1</AdresseIP>
+	<Debit unit="Mo" temps="s">10</Debit>
 </ConfigCamera>
 

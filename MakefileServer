@@ -11,8 +11,8 @@ EXEC = Server
 all: $(EXEC)
 
 #Construction de l'éxecutable
-$(EXEC): libCamera.o udp-talker.o
-			$(CC) -o $(EXEC) libCamera.o udp-talker.o 
+$(EXEC): libCamera.o udp-talker.o ConfigConnectXml.o
+			$(CC) -o $(EXEC) libCamera.o udp-talker.o ConfigConnectXml.o -lxml2
 
 #Construction des fichiers objets
 libCamera.o : libCamera/libCamera.c
@@ -20,6 +20,9 @@ libCamera.o : libCamera/libCamera.c
 
 udp-talker.o : srcServer/udp-talker.c
 					$(CC) -o udp-talker.o -c srcServer/udp-talker.c
+					
+ConfigConnectXml.o : libConfig/ConfigConnectXml.c
+					$(CC) -o ConfigConnectXml.o -c libConfig/ConfigConnectXml.c
 
 #Pour effacer les fichiers objets : appeler make clean
 clean : 

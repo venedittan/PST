@@ -33,31 +33,31 @@ const char* ErreurBind(int erreur){
 }
 
 /*Fonction de connexion*/
-UDPConnexion ConnexionServer(char* ipv4,int port,unsigned short int tailleMessage){
+UDPConnexion ConnexionServer(Configuration config){
 
 	/*Nouvelle connexion*/
 	UDPConnexion interface;
-	char portStr[MAX_PORT + 1];
-
+	char *portStr;
+	
 	/*Initialisation de la nouvelle connexion*/
-	strcpy(interface.ipv4,ipv4);
 	memset(&(interface.hints), 0, sizeof(interface.hints));
-	interface.tailleMessage = tailleMessage;
+	interface.lienConnexion = 0;
+	interface.tailleMessage = config.tailleMessage;
 	interface.hints.ai_family = AF_INET; // IPv4
 	interface.hints.ai_socktype = SOCK_DGRAM; // UDP
-
 	interface.longueurAdresseClient = sizeof(struct sockaddr_in);
-	interface.lienConnexion = 0;
-	
 	interface.infoServeur = calloc(1,sizeof(struct addrinfo));
-
+	interface.ipv4 = calloc(1,config.tailleAdresse);
+	interface.port = calloc(1,config.taillePort+1);
+	portStr = calloc(1,config.taillePort+1);
+	strcpy(interface.ipv4,config.adresseIp);
+	
 	/*Vérification du port d'écoute*/
-	if(port >= 1500 && port <= 65000){
-		sprintf(portStr,"%d",port);
-		memset(interface.port,0,sizeof(interface.port));
+	if(config.port >= 1500 && config.port <= 65000){
+		sprintf(portStr,"%d",config.port);
 		strcpy(interface.port,portStr);
+		free(portStr);
 	}
-
 	else{
 		perror("Le port d'écoute n'est pas compris entre 1500 et 65000");
 		exit(EXIT_FAILURE);
@@ -88,26 +88,31 @@ UDPConnexion ConnexionServer(char* ipv4,int port,unsigned short int tailleMessag
 }
 
 /*Fonction de connexion*/
-UDPConnexion ConnexionClient(int port,unsigned short int tailleMessage){
+UDPConnexion ConnexionClient(Configuration config){
 
 	/*Nouvelle connexion*/
 	UDPConnexion interface;
-	char portStr[MAX_PORT + 1];
+	char *portStr;
 
 	/*Initialisation de la nouvelle connexion*/
 	memset(&(interface.hints), 0, sizeof(interface.hints));
+	interface.lienConnexion = 0;
+	interface.infoServeur = NULL;
+	interface.ipv4 = NULL;
 	interface.hints.ai_family = AF_INET; // IPv4
 	interface.hints.ai_socktype = SOCK_DGRAM; // UDP
 	interface.hints.ai_flags = AI_PASSIVE; // Toutes les adresses disponibles
 	interface.longueurAdresseClient = sizeof(struct sockaddr_in);
-	interface.lienConnexion = 0;
-	interface.infoServeur = NULL;
-	interface.tailleMessage = tailleMessage;
+	interface.tailleMessage = config.tailleMessage;
+	interface.port = calloc(1,config.taillePort+1);
+	portStr = calloc(1,config.taillePort+1);
+	
 
 	/*Vérification du port d'écoute*/
-	if(port >= 1500 && port <= 65000){
-		sprintf(portStr,"%d",port);
+	if(config.port >= 1500 && config.port <= 65000){
+		sprintf(portStr,"%d",config.port);
 		strcpy(interface.port,portStr);
+		free(portStr);
 	}
 	else{
 		perror("Le port d'écoute n'est pas compris entre 1500 et 65000");
@@ -179,7 +184,28 @@ int AttenteMessage(UDPConnexion interface){
 /*Fonction de fermeture de connexion*/
 void FermetureConnexion(UDPConnexion interface,int Erreur){
 	close(interface.lienConnexion);
+	free(interface.port);
+	if(interface.ipv4 != NULL)
+		free(interface.ipv4);
+		
 	exit((Erreur == EXIT_FAILURE) ? EXIT_FAILURE : EXIT_SUCCESS);
+}
+
+/*Fonction pour récupérer une chaine alloué dynamiquement*/
+char* GetDynamicStringFromConsole(int maxTailleChaine){
+	int i,c;
+	char *string;
+	
+	string = malloc(sizeof(char));
+	string[0] = '\0';
+	
+	for(i=0;i<maxTailleChaine && (c=getchar()) != '\n' && c != EOF ;i++){
+		string = realloc(string,(i+2)*sizeof(char));
+		string[i] = (char)c;
+		string[i+1] = '\0';
+	}
+	
+	return string;
 }
 
 

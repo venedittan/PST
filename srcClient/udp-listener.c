@@ -1,24 +1,36 @@
 #include "../include/Api.h"
 
-int main()
-{
+int main(int argc,char *argv[]){
 	UDPConnexion interface;
-	int port;
-	char msg[MAX_MSG + 1],ipv4[IPv4_LENGTH];
-
-	/*Paramètres*/
-	printf("Entrez le nom du serveur ou son adresse IP : ");
-	fgets(ipv4,IPv4_LENGTH,stdin);
-
+	int tailleMessage;
+	Configuration config;
+	char *msg,*msgCopy;
+	
+	//Chargement de la configuration
+	if(argc != 2){
+		perror("Erreur utilisation du programme -> passez en argument le chemin du fichier de configuration");
+		exit(EXIT_FAILURE);
+	}
+	
+	config = ParseConfig(GetConfigDoc(argv[1]));
+		
 	//Initialisation de la connexion UDP
-	interface = ConnexionServer(ipv4,8080,MAX_MSG+1);
-
-	printf("Test -> Entrez un message de moins de %d caractères : ",MAX_MSG);
-	fgets(msg,MAX_MSG+1,stdin);
-
-
-	// Arrêt lorsque l'utilisateur saisit une ligne ne contenant qu'un point
-	while (strcmp(msg, ".")) {
+	msg = calloc(1,config.tailleMessage*sizeof(char));
+	if(msg == NULL){
+		perror("Erreur allocation mémoire pour les messages \n");
+		exit(EXIT_FAILURE);
+	}
+	
+	tailleMessage = config.tailleMessage;
+	interface = ConnexionServer(config);
+	FreeConfiguration(&config);
+	
+	/*Debut des messages*/
+	printf("Test -> Entrez un message de moins de %d caractères : ",tailleMessage);
+	GetDynamicStringFromConsole(tailleMessage); 
+	
+	// Arrêt lorsque l'utilisateur saisit une ligne ne contenant qu'un point strcmp(msg,".")
+	while (0) {
 		if (strlen(msg) > 0) {
 			// Envoi de la ligne au serveur
 			if (!EnvoiMessageServer(interface,msg)) {
@@ -29,19 +41,20 @@ int main()
 			//Traitement du message
 			if (AttenteMessage(interface)) {
 				// Lecture de la ligne modifiée par le serveur.
-				memset(msg, 0, sizeof msg); // Mise à zéro du tampon
+				memset(msg, 0, sizeof(msg)); // Mise à zéro du tampon
 				if (!ReceptionMessageServer(interface,msg)) {
 					perror("Erreur lors de la réception du message \n");
 					FermetureConnexion(interface,EXIT_FAILURE);
 				}
 				printf("Message traité : %s\n", msg);
 			}
+			
 			else 
 				printf("Pas de réponse dans la seconde. \n");			
 		}
 		//Nouveau message
-		printf("Entrez un message de moins de %d caractères : ",MAX_MSG);
-		fgets(msg,MAX_MSG+1,stdin);
+		printf("Entrez un message de moins de %d caractères : ",tailleMessage);
+		fgets(msg,tailleMessage+1,stdin);
 	}
 	//Fin connexion
 	FermetureConnexion(interface,EXIT_SUCCESS);

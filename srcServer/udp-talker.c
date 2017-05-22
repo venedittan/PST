@@ -1,23 +1,32 @@
 #include "../include/Api.h"
 
-int main()
-{
+int main(int argc,char *argv[]){
 	UDPConnexion interface;
 	int i;
+	char* msg;
 	struct sockaddr_in adresseClient;
-
-	char msg[MAX_MSG + 1];
+	Configuration config;
+	
+	//Chargement de la configuration
+	if(argc != 2){
+		perror("Erreur utilisation du programme -> passez en argument le chemin du fichier de configuration");
+		exit(EXIT_FAILURE);
+	}
+	config = ParseConfig(GetConfigDoc(argv[1]));
+	
+	msg = calloc(1,config.tailleMessage);
 	
 	/*Initialisation de la connexion UDP*/
-	interface = ConnexionClient(8080,MAX_MSG + 1);
-
+	interface = ConnexionClient(config);
+	FreeConfiguration(&config);
+	
 	// Libération de la mémoire occupée par les enregistrements
 	printf("Attente de requête sur le port %s\n",interface.port);
 
 	while (1) {
 		// Mise à zéro du tampon de façon à connaître le délimiteur
 		// de fin de chaîne.
-		memset(msg, 0, sizeof msg);
+		memset(msg, 0, sizeof(msg));
 
 		if (!ReceptionMessageClient(interface,&adresseClient,msg)) {
 			perror("Erreur lors de la réception du message");

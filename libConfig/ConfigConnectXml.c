@@ -1,11 +1,13 @@
 #include "ConfigConnectXml.h"
 
 xmlDoc* GetConfigDoc(char* file){
-    xmlDoc* document = xmlReadFile(file,"utf-8",0);
-    if(document != NULL)
+		printf("Init doc \n");
+    xmlDoc* document = xmlReadFile(file,"utf-8",0);; 
+    if(document != NULL){
         return document;
+    }
     else{
-        fprintf(stderr,"Erreur : le fichier n'a pas pu etre ouvert et décodé");
+        fprintf(stderr,"Erreur : le fichier n'a pas pu etre ouvert et décodé \n");
         exit(EXIT_FAILURE);
     }
 }
@@ -82,4 +84,10 @@ Configuration ParseConfig(xmlDoc* document){
 
     /*Retour Config*/
     return config;
+}
+
+void FreeConfiguration(Configuration* config){
+	free(config->adresseIp);
+	free(config->uniteDebit);
+	free(config->tempsDebit);
 }

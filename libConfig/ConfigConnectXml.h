@@ -23,7 +23,6 @@ int CheckRoot(xmlNode*);
 Configuration ParseConfig(xmlDoc*);
 char* GetAttribute(xmlNode*,const char*);
 char* GetValue(xmlNode*);
-
-
+void FreeConfiguration(Configuration*);
 
 #endif // CONFINGCONNECTXML_H_INCLUDED

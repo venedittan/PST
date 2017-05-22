@@ -11,8 +11,8 @@ EXEC = Client
 all: $(EXEC)
 
 #Construction de l'éxecutable
-$(EXEC): libCamera.o udp-listener.o
-			$(CC) -o $(EXEC) libCamera.o udp-listener.o  
+$(EXEC): libCamera.o udp-listener.o ConfigConnectXml.o
+			$(CC) -o $(EXEC) libCamera.o udp-listener.o ConfigConnectXml.o -lxml2  
 
 #Construction des fichiers objets
 libCamera.o : libCamera/libCamera.c
@@ -20,6 +20,9 @@ libCamera.o : libCamera/libCamera.c
 
 udp-listener.o : srcClient/udp-listener.c
 					$(CC) -o udp-listener.o -c srcClient/udp-listener.c
+
+ConfigConnectXml.o : libConfig/ConfigConnectXml.c
+					$(CC) -o ConfigConnectXml.o -c libConfig/ConfigConnectXml.c
 
 #Pour effacer les fichiers objets : appeler make clean
 clean : 
