@@ -1,7 +1,7 @@
 #include "../include/Api.h"
 
 int main(int argc,char *argv[]){
-	UDPConnexion interface;
+	TCPConnexion interface;
 	int tailleMessage;
 	Configuration config;
 	char *msg,*msgCopy;
@@ -28,7 +28,7 @@ int main(int argc,char *argv[]){
 	
 	/*Debut des messages*/
 	printf("Test -> Entrez un message de moins de %d caractères : ",tailleMessage);
-	GetDynamicStringFromConsole(tailleMessage); 
+	fgets(msg,tailleMessage+1,stdin); 
 	
 	while (strcmp(msg,".")) {
 		if (strlen(msg) > 0) {

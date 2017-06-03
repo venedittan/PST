@@ -20,6 +20,6 @@ typedef struct TCPConnexion{
 	struct addrinfo hints;
 	struct addrinfo *infoServeur;
 	char *ipv4;
-}TCPConnexion;
+}UDPConnexion;
 
 

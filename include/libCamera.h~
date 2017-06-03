@@ -9,6 +9,6 @@ int EnvoiMessageClient(TCPConnexion,struct sockaddr_in*,char*);
 int ReceptionMessageServer(TCPConnexion,char*);
 int EnvoiMessageServer(TCPConnexion,char*);
 int AttenteMessage(TCPConnexion);
-void FermetureConnexion(TCPConnexion,int);
+void FermetureConnexion(UDPConnexion,int);
 const char* ErreurBind(int);
 char* GetDynamicStringFromConsole(int);

@@ -11,15 +11,15 @@ EXEC = Client
 all: $(EXEC)
 
 #Construction de l'éxecutable
-$(EXEC): libCamera.o udp-listener.o ConfigConnectXml.o
-			$(CC) -o $(EXEC) libCamera.o udp-listener.o ConfigConnectXml.o -lxml2  
+$(EXEC): libCamera.o tcp-listener.o ConfigConnectXml.o
+			$(CC) -o $(EXEC) libCamera.o tcp-listener.o ConfigConnectXml.o -lxml2  
 
 #Construction des fichiers objets
 libCamera.o : libCamera/libCamera.c
 				$(CC) -o libCamera.o -c libCamera/libCamera.c
 
-udp-listener.o : srcClient/udp-listener.c
-					$(CC) -o udp-listener.o -c srcClient/udp-listener.c
+tcp-listener.o : srcClient/tcp-listener.c
+					$(CC) -o tcp-listener.o -c srcClient/tcp-listener.c
 
 ConfigConnectXml.o : libConfig/ConfigConnectXml.c
 					$(CC) -o ConfigConnectXml.o -c libConfig/ConfigConnectXml.c
