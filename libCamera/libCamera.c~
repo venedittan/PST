@@ -36,7 +36,7 @@ const char* ErreurBind(int erreur){
 TCPConnexion ConnexionServer(Configuration config){
 
 	/*Nouvelle connexion*/
-	UDPConnexion interface;
+	TCPConnexion interface;
 	char *portStr;
 	
 	/*Initialisation de la nouvelle connexion*/
@@ -153,22 +153,22 @@ int ReceptionMessageClient(UDPConnexion interface,struct sockaddr_in* adresseCli
 }
 
 /*Envoi Message Client*/
-int EnvoiMessageClient(UDPConnexion interface,struct sockaddr_in* adresseClient,char *msg){
+int EnvoiMessageClient(TCPConnexion interface,struct sockaddr_in* adresseClient,char *msg){
 	return sendto(interface.lienConnexion,msg,sizeof(msg),0,(struct sockaddr *) adresseClient,interface.longueurAdresseClient) != -1;
 }
 
 /*Reception Message Serveur*/
-int ReceptionMessageServer(UDPConnexion interface,char *msg){
+int ReceptionMessageServer(TCPConnexion interface,char *msg){
 	return recv(interface.lienConnexion,msg,sizeof(msg),0) != -1;
 }
 
 /*Envoi Message Serveur*/
-int EnvoiMessageServer(UDPConnexion interface,char *msg){
+int EnvoiMessageServer(TCPConnexion interface,char *msg){
 	return sendto(interface.lienConnexion,msg,sizeof(msg),0,interface.infoServeur->ai_addr,interface.infoServeur->ai_addrlen) != -1;
 }
 
 /*Attente Message 1s*/
-int AttenteMessage(UDPConnexion interface){
+int AttenteMessage(TCPConnexion interface){
 	struct timeval timeVal;
 	fd_set readSet;
 
@@ -182,7 +182,7 @@ int AttenteMessage(UDPConnexion interface){
 }
 
 /*Fonction de fermeture de connexion*/
-void FermetureConnexion(UDPConnexion interface,int Erreur){
+void FermetureConnexion(TCPConnexion interface,int Erreur){
 	close(interface.lienConnexion);
 	free(interface.port);
 	if(interface.ipv4 != NULL)
