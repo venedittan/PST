@@ -19,13 +19,22 @@ const char* ErreurBind(int erreur){
 			return "Une interface inexistance a été demandée ou bien l'adresse demandée n'est pas locale";
 
 		case EFAULT : 
-			return "addr pointe en dehors de l'espace d'adresse accessible";
+			return "l'addresse pointe en dehors de l'espace d'adresse accessible";
 
 		case EINVAL : 
 			return "La longueur addrlen est fausse , ou la socket n'est pas de la famille AF_UNIX";
 
 		case ELOOP : 
-			return "addr contient des références circulaires";
+			return "l'addresse contient des références circulaires";
+
+        case ENAMETOOLONG : 
+            return "Adresse trop longue";
+        
+        case ENOMEM : 
+            return "Espace mémoire RAM insuffisant";
+        	
+        case EROFS : 
+            return "Le socket est un répertoire ou fichier en lecture seule";
 
 		default:
 			return "Erreur Autre";
@@ -44,7 +53,7 @@ TCPConnexion ConnexionServer(Configuration config){
 	interface.lienConnexion = 0;
 	interface.tailleMessage = config.tailleMessage;
 	interface.hints.ai_family = AF_INET; // IPv4
-	interface.hints.ai_socktype = SOCK_STREAM; // TCP
+	interface.hints.ai_socktype = SOCK_DGRAM; // TCP
 	interface.longueurAdresseClient = sizeof(struct sockaddr_in);
 	interface.infoServeur = calloc(1,sizeof(struct addrinfo));
 	interface.ipv4 = calloc(1,config.tailleAdresse);
@@ -78,9 +87,16 @@ TCPConnexion ConnexionServer(Configuration config){
 	}
 
 	/*On lie la connexion*/
-	if(connect(interface.lienConnexion,interface.infoServeur->ai_addr,interface.infoServeur->ai_addrlen) == -1){
+	if(bind(interface.lienConnexion,interface.infoServeur->ai_addr,interface.infoServeur->ai_addrlen) == -1){
+		close(interface.lienConnexion);
 		fprintf(stderr,"Erreur lors de la liaison au port %s -> Erreur : %s \n",interface.port,ErreurBind(errno));
 		exit(EXIT_FAILURE);
+	}
+
+	/*On ecoute sur le port*/
+	if(listen(interface.lienConnexion,60) == -1){
+		close(interface.lienConnexion);
+		fprintf(stderr,"Impossible d'écouter sur le port %s -> Erreur : %s \n",interface.port,ErreurBind(errno));
 	}
 	
 	/*Renvoi de la connexion*/
@@ -100,7 +116,7 @@ TCPConnexion ConnexionClient(Configuration config){
 	interface.infoServeur = NULL;
 	interface.ipv4 = NULL;
 	interface.hints.ai_family = AF_INET; // IPv4
-	interface.hints.ai_socktype = SOCK_STREAM; // TCP
+	interface.hints.ai_socktype = SOCK_DGRAM; // TCP
 	interface.hints.ai_flags = AI_PASSIVE; // Toutes les adresses disponibles
 	interface.longueurAdresseClient = sizeof(struct sockaddr_in);
 	interface.tailleMessage = config.tailleMessage;
@@ -148,7 +164,7 @@ TCPConnexion ConnexionClient(Configuration config){
 }
 
 /*Reception Message Client*/
-int ReceptionMessageClient(UDPConnexion interface,struct sockaddr_in* adresseClient,char *msg){
+int ReceptionMessageClient(TCPConnexion interface,struct sockaddr_in* adresseClient,char *msg){
 	return recvfrom(interface.lienConnexion,msg,sizeof(msg),0,(struct sockaddr *) adresseClient,&(interface.longueurAdresseClient)) != -1;
 }
 
